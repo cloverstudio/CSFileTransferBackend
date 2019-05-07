@@ -1,0 +1,24 @@
+{
+  "name": "cs-file-transfer-upload-backend",
+  "version": "1.0.0",
+  "description": "",
+  "main": "chunkedUpload.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/cloverstudio/CSFileTransferBackend.git"
+  },
+  "keywords": [
+    "cs",
+    "upload",
+    "backend"
+  ],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/cloverstudio/CSFileTransferBackend/issues"
+  },
+  "homepage": "https://github.com/cloverstudio/CSFileTransferBackend#readme"
+}
