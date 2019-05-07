@@ -2,13 +2,14 @@ var fs = require('fs');
 var path = require('path');
 
 class ChunkedUpload {
-	constructor(tempFolderPath) {
-		this.tempFolder = tempFolderPath;
-		if (!fs.existsSync(path.join(__dirname, `../temporary`))) {
-			fs.mkdirSync('temporary');
+	constructor(storage, temporary) {
+		this.storage = storage;
+		this.temporary = temporary;
+		if (!fs.existsSync(this.storage)) {
+			throw new Error("Storage file doesn't exists");
 		}
-		if (!fs.existsSync(path.join(__dirname, `../${tempFolderPath}`))) {
-			fs.mkdirSync(tempFolderPath);
+		if (!fs.existsSync(this.temporary)) {
+			throw new Error("Temporary file doesn't exists");
 		}
 	}
 
@@ -16,11 +17,11 @@ class ChunkedUpload {
 		let { slice, fileName, chunkNumber, numberOfChunks, size } = req.body;
 		console.log(fileName, chunkNumber, numberOfChunks, slice.length, size);
 
-		let filePath = `./temporary/${size}${fileName}${chunkNumber}`;
+		let filePath = `${this.temporary}/${size}${fileName}${chunkNumber}`;
 		fs.writeFileSync(filePath, Buffer.from(slice, 'base64'));
 		console.log(Buffer.from(slice, 'base64').length)
 		for (let i = 1; i <= numberOfChunks; i++) {
-			if (!fs.existsSync(path.join(__dirname, `../temporary/${size}${fileName}${i}`))) {
+			if (!fs.existsSync(path.join(`${this.temporary}`, `${size}${fileName}${i}`))) {
 				return callback('partially_done');
 			} 
 		}
@@ -28,11 +29,11 @@ class ChunkedUpload {
 	}
 
 	merge(fileName, numberOfChunks, size) {
-		var mergedFile = fs.createWriteStream(`./storage/${fileName}`);
+		var mergedFile = fs.createWriteStream(`${this.storage}/${fileName}`);
 
 		for (let i = 1; i <= numberOfChunks; i++) {
-			if (fs.existsSync(path.join(__dirname, `../temporary/${size}${fileName}${i}`))) {
-				let current = fs.readFileSync(`./temporary/${size}${fileName}${i}`);
+			if (fs.existsSync(path.join(`${this.temporary}`, `${size}${fileName}${i}`))) {
+				let current = fs.readFileSync(`${this.temporary}/${size}${fileName}${i}`);
 				mergedFile.write(current);
 			} else {
 				console.log('Cant find', i);
@@ -47,7 +48,7 @@ class ChunkedUpload {
 		let chunks = [];
 		let length = 0;
 		for (let i = 1; i <= numberOfChunks; i++) {
-			if (fs.existsSync(path.join(__dirname, `../temporary/${size}${fileName}${i}`))) {
+			if (fs.existsSync(path.join(`${this.temporary}`, `${size}${fileName}${i}`))) {
 				chunks.push(true);
 				length++;
 			} else {
@@ -59,10 +60,10 @@ class ChunkedUpload {
 
 	clean(fileName, numberOfChunks, size) {
 		for (let i = 1; i <= numberOfChunks; i++) {
-			if (fs.existsSync(path.join(__dirname, `../temporary/${size}${fileName}${i}`))) {
-				fs.unlink(`./temporary/${size}${fileName}${i}`, (error) => {
+			if (fs.existsSync(path.join( `${this.temporary}`, `${size}${fileName}${i}`))) {
+				fs.unlink(`${this.temporary}/${size}${fileName}${i}`, (error) => {
 					if (error){
-						console.log('Deleting Error:', `../temporary/${size}${fileName}${i}`, error);
+						console.log('Deleting Error:', `${this.temporary}/${size}${fileName}${i}`, error);
 					}
 				});
 			}
@@ -71,3 +72,4 @@ class ChunkedUpload {
 }
 
 module.exports = ChunkedUpload;
+
