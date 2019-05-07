@@ -27,7 +27,9 @@ chunkedUpload.post(req, async function (status) {
       // do something
     }
 });
-  // When the last chunk is uploaded it will trigger callback with status done, use merge function to merge all chunks into one file, and use clean function to delete chunks from chunks folder. 
+  // When the last chunk is uploaded it will trigger callback with 
+  // status done, use merge function to merge all chunks into one file,
+  // and use clean function to delete chunks from chunks folder. 
 ```
 ### Get function:
 ```Javascript
