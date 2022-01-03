@@ -39,6 +39,7 @@ class ChunkedUpload {
 				console.log('Cant find', i);
 			}
 		}
+		mergedFile.end()
 	}
 
 	get(req, callback) {
